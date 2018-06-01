@@ -1,0 +1,14 @@
+﻿{
+  "Apps": [
+    {
+      "ProgramName": "kodi",
+      "Parameters": []
+    },
+    /*
+    {
+      "ProgramName": "steam",
+      "Parameters": []
+    }
+    */
+  ]
+}

@@ -24,9 +24,17 @@ namespace MousePad.Controllers.Gamepad
         public Xbox360Controller()
         {
             input = new InputSimulator();
+            Task.Factory.StartNew(() =>
+            {
+                while (true)
+                {
+                    GetControllerInput();
+                    Thread.Sleep(10);
+                }
+            });
         }
         private State prevState = new State() { PacketNumber = -1 };
-        //private Keystroke lastKeystrokeDown = ;
+
         public void GetControllerInput()
         {
             var controller = FirstAvailable();
@@ -169,6 +177,7 @@ namespace MousePad.Controllers.Gamepad
             var pos = GetCursorPosition();
             var newX = pos.X + (PixelMovement * x);
             var newY = pos.Y + (PixelMovement * y);
+            Debug.WriteLine("x360 set position");
             SetCursorPosition(newX, newY);
         }
         public Controller FirstAvailable()

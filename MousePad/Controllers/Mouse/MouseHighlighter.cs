@@ -18,6 +18,7 @@ namespace MousePad.Controllers.Mouse
         {
             mouse = new MouseOperations();
             InitializeComponent();
+            // ChangeRadius(20);
         }
         private const int WS_EX_TRANSPARENT = 0x20;
         protected override CreateParams CreateParams
@@ -35,9 +36,14 @@ namespace MousePad.Controllers.Mouse
             var curPos = mouse.GetCursorPosition();
             if (mouse.Compare(lastPos, curPos) == 0 && !force)
                 return;
-            // Debug.WriteLine($"X:{curPos.X} Y:{curPos.Y}");
-            this.Top = curPos.Y-EllipseRadius;
-            this.Left = curPos.X-EllipseRadius;
+            MoveEclipseDelegate method = MoveEclipse;
+            this.Invoke(method, curPos);
+        }
+        public delegate void MoveEclipseDelegate(POINT x);
+        public void MoveEclipse(POINT curPos)
+        {
+            this.Top = curPos.Y - EllipseRadius;
+            this.Left = curPos.X - EllipseRadius;
         }
         public void ChangeRadius(int newRadius)
         {
@@ -88,11 +94,7 @@ namespace MousePad.Controllers.Mouse
             this.BackColor = Color.Yellow;
             this.StartPosition = FormStartPosition.Manual;
             this.ShowIcon = false;
-
-            ChangeRadius(20);
-            
             this.ResumeLayout(false);
-
         }
     }
 }
