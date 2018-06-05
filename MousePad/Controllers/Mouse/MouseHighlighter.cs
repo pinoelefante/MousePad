@@ -12,12 +12,18 @@ namespace MousePad.Controllers.Mouse
 {
     public class MouseHighlighter : Form, IDeviceStatus
     {
+        private static readonly Color TRANSPARENT_COLOR = Color.Magenta;
+        private static readonly Color HIGHLIGHT_COLOR = Color.Yellow;
+        private SolidBrush MouseBrush;
+
         private MouseOperations mouse;
         private int EllipseRadius = 25;
         public MouseHighlighter() : base()
         {
+            MouseBrush = new SolidBrush(HIGHLIGHT_COLOR);
             mouse = new MouseOperations();
             InitializeComponent();
+            ChangeRadius(20);
         }
         private const int WS_EX_TRANSPARENT = 0x20;
         protected override CreateParams CreateParams
@@ -35,17 +41,15 @@ namespace MousePad.Controllers.Mouse
             var curPos = mouse.GetCursorPosition();
             if (mouse.Compare(lastPos, curPos) == 0 && !force)
                 return;
-            // Debug.WriteLine($"X:{curPos.X} Y:{curPos.Y}");
-            this.Top = curPos.Y-EllipseRadius;
-            this.Left = curPos.X-EllipseRadius;
+            using (Graphics g = Graphics.FromHwnd(this.Handle))
+            {
+                g.Clear(TRANSPARENT_COLOR);
+                g.FillEllipse(MouseBrush, curPos.X - EllipseRadius, curPos.Y - EllipseRadius, EllipseRadius * 2, EllipseRadius * 2);
+            }
         }
         public void ChangeRadius(int newRadius)
         {
             EllipseRadius = newRadius;
-            this.Size = new Size(EllipseRadius * 2, EllipseRadius * 2);
-            GraphicsPath gp = new GraphicsPath();
-            gp.AddEllipse(0, 0, EllipseRadius * 2, EllipseRadius * 2);
-            this.Region = new Region(gp);
             DrawHighlight(true);
         }
 
@@ -79,20 +83,20 @@ namespace MousePad.Controllers.Mouse
         {
             this.SuspendLayout();
 
-            this.TopMost = true;
-            this.Opacity = 0.4;
-            this.ShowInTaskbar = false;
+            this.BackColor = TRANSPARENT_COLOR;
+            this.TransparencyKey = TRANSPARENT_COLOR;
+            this.DoubleBuffered = true;
             this.FormBorderStyle = FormBorderStyle.None;
-            this.MinimumSize = new Size(30, 30);
-            this.MaximumSize = new Size(150, 150);
-            this.BackColor = Color.Yellow;
-            this.StartPosition = FormStartPosition.Manual;
+            this.MinimizeBox = false;
+            this.Name = "MouseHighlighter";
+            this.Opacity = 0.4D;
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
+            this.StartPosition = FormStartPosition.Manual;
+            this.TopMost = true;
+            this.WindowState = FormWindowState.Maximized;
 
-            ChangeRadius(20);
-            
             this.ResumeLayout(false);
-
         }
     }
 }
